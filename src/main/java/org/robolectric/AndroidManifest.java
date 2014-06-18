@@ -1,6 +1,7 @@
 package org.robolectric;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Color;
 import org.robolectric.res.*;
 import org.w3c.dom.Document;
@@ -187,7 +188,16 @@ public class AndroidManifest {
       Node nameItem = contentProviderNode.getAttributes().getNamedItem("android:name");
       Node authorityItem = contentProviderNode.getAttributes().getNamedItem("android:authorities");
       if (nameItem != null && authorityItem != null) {
-        providers.add(new ContentProviderData(resolveClassRef(nameItem.getTextContent()), authorityItem.getTextContent()));
+          final String nameItemString = nameItem.getTextContent();
+          final String authorityItemString = authorityItem.getTextContent();
+          if (authorityItemString != null && authorityItemString.startsWith("@")) {
+              final Resources resources = Robolectric.getShadowApplication().getApplicationContext().getResources();
+              final int stringResourceId = resources.getIdentifier(authorityItemString, "string", packageName);
+              final String authorities = resources.getString(stringResourceId);
+              providers.add(new ContentProviderData(resolveClassRef(nameItemString), authorities));
+          } else {
+              providers.add(new ContentProviderData(resolveClassRef(nameItemString), authorityItemString));
+          }
       }
     }
   }

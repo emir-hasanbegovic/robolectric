@@ -61,6 +61,15 @@ public class AndroidManifestTest {
   }
 
   @Test
+  public void shouldReadContentProvidersWithResourceBoundString() throws Exception {
+    AndroidManifest config = newConfig("TestAndroidManifestWithContentProvidersWithResourceBoundString.xml");
+    assertThat(config.getContentProviders()).hasSize(1);
+
+    assertThat(config.getContentProviders().get(0).getClassName()).isEqualTo("org.robolectric.tester.PartiallyQualifiedClassName");
+    assertThat(config.getContentProviders().get(0).getAuthority()).isEqualTo("org.robolectric");
+  }
+
+  @Test
   public void shouldReadBroadcastReceivers() throws Exception {
     AndroidManifest config = newConfig("TestAndroidManifestWithReceivers.xml");
 
